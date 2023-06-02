@@ -65,7 +65,7 @@ const ProjcetUploadModal = ({
             } = formData;
 
             if (isEdit) {
-                if (formData.memberCount < projectData.requirements.memberCount)
+                if (Number(formData.memberCount )< Number(projectData.requirements.memberCount))
                     return alert(
                         `참여인원은 ${projectData.requirements.memberCount} 보다 작을 수 없습니다.`
                     );

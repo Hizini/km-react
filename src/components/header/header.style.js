@@ -13,7 +13,14 @@ export const LogoWrap = styled.div`
     cursor: pointer;
 `;
 
-export const Logo = styled.img``;
+export const Logo = styled.div`
+    font-size: 30px;
+    font-weight: 900;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+`;
 
 export const UserInfoWrap = styled.div`
     display: flex;

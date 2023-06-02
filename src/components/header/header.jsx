@@ -58,7 +58,7 @@ const Header = () => {
             />
             <HeaderContainer>
                 <LogoWrap onClick={() => navigate("/")}>
-                    <Logo src="../../assets/logo.svg" />
+                    <Logo>WSP</Logo>
                 </LogoWrap>
                 {userData.name ? (
                     <UserInfoWrap>

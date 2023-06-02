@@ -47,6 +47,7 @@ const projectDetail = () => {
     const navigate = useNavigate();
 
     const handleApplyModalOpen = () => {
+		if(projectData.members?.length >= projectData.requirements.memberCount) return alert('모집이 마감되었습니다.')
         setIsOpen(true);
     };
 

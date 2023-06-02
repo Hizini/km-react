@@ -17,7 +17,7 @@ const initUserData = {
   major: "",
   age: "",
   gender: "",
-  contect: "",
+  contact: "",
 };
 // 로그인한 유저 데이터 저장
 const UserAccountState = atom({

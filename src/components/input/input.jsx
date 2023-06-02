@@ -9,6 +9,7 @@ const InputComp = ({
   error=false,
   size = "medium",
   variant = "standard",
+  placeholder = ''
 }) => {
   return (
     <StyledInput
@@ -20,6 +21,7 @@ const InputComp = ({
       variant={variant}
       size={size}
       type={type}
+	  placeholder={placeholder}
     />
   );
 };

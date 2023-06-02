@@ -11,14 +11,16 @@ import ButtonComponents from "../button/button";
 import { Avatar } from "@mui/material";
 import { LoginModal, SignupModal } from "../modals";
 import { useNavigate } from "react-router-dom";
-import { useRecoilState } from "recoil";
+import { useRecoilValue } from "recoil";
 import { UserAccountState } from "../../modules/store/common.recoil";
+import { RoutesString } from "../../modules/constant";
+
 const Header = () => {
   const navigate = useNavigate();
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isSignupOpen, setIsSignupOpen] = useState(false);
-  const [isLogin, setIsLogin] = useState(false);
-  const [userData, setUserData] = useRecoilState(UserAccountState);
+  const userData = useRecoilValue(UserAccountState);
+
   const handleLoginModalOpen = () => {
     setIsLoginOpen(true);
   };
@@ -35,10 +37,10 @@ const Header = () => {
     setIsSignupOpen(true);
   };
 
-  const handleLogin = () => {
-    setIsLogin(true);
-    handleLoginModalClose();
-  };
+  const handleClickMypage = () => {
+	if(userData.projectId) navigate(RoutesString.PROJECT_DETAIL, { state: { id: userData.projectId } });
+	else return alert('프로젝트가 없습니다.')
+  }
 
   return (
     <>
@@ -46,19 +48,18 @@ const Header = () => {
         isOpen={isLoginOpen}
         onClose={handleLoginModalClose}
         onSignup={handleSignupModalOpen}
-        onLogin={handleLogin}
       />
       <SignupModal isOpen={isSignupOpen} onClose={handleSignupModalClose} />
       <HeaderContainer>
         <LogoWrap onClick={() => navigate("/")}>
           <Logo src="../../assets/logo.svg" />
         </LogoWrap>
-        {isLogin ? (
+        {userData.name ? (
           <UserInfoWrap>
             <Avatar />
             <UserInfoRt>
-              <UserName>이현규</UserName>
-              <ButtonComponents label="내 프로젝트" size="small" />
+              <UserName>{userData.name}</UserName>
+              <ButtonComponents label="내 프로젝트" size="small" onClick={handleClickMypage}/>
             </UserInfoRt>
           </UserInfoWrap>
         ) : (

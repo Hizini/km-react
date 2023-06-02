@@ -39,8 +39,8 @@ const initData = {
 const projectDetail = () => {
     const [isApplyModalOepn, setIsOpen] = useState(false);
     const [isProjectUploadOpen, setIsProjectUploadOpen] = useState(false);
-    const [projectData, setProjectDate] = useState(initData);
-	const [userData, setUserData] = useRecoilState(UserAccountState);
+    const [projectData, setProjectData] = useState(initData);
+    const [userData, setUserData] = useRecoilState(UserAccountState);
     //로그인한 유저가 주최자인지 확인용 변수
     const isOwner = userData.name === projectData?.owner;
     const location = useLocation();
@@ -71,11 +71,14 @@ const projectDetail = () => {
                     `http://localhost:2008/apis/project/${location.state.id}`,
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
-				navigate('/')
-				const user = await axios.get(`http://localhost:2008/apis/user/me`, { headers: { Authorization: `Bearer ${token}` }})
-				setUserData(user.data.data)
+                navigate("/");
+                const user = await axios.get(
+                    `http://localhost:2008/apis/user/me`,
+                    { headers: { Authorization: `Bearer ${token}` } }
+                );
+                setUserData(user.data.data);
             } catch (e) {
-				alert('Error')
+                alert("Error");
             }
         }
     };
@@ -91,9 +94,9 @@ const projectDetail = () => {
                     { applicationId },
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
-                getProjectData();
+                getApplicationData();
             } catch (e) {
-               alert('Error')
+                alert("Error");
             }
         }
     };
@@ -111,9 +114,9 @@ const projectDetail = () => {
                         headers: { Authorization: `Bearer ${token}` },
                     }
                 );
-                getProjectData();
+                getApplicationData();
             } catch (e) {
-				alert('Error')
+                alert("Error");
             }
         }
     };
@@ -124,11 +127,27 @@ const projectDetail = () => {
             const project = await axios.get(
                 `http://localhost:2008/apis/project/${location.state.id}`
             );
-            setProjectDate(project.data.data);
+            setProjectData(project.data.data);
         } catch (e) {
             alert("프로젝트 블러오기 오류");
         }
     }, [location, navigate]);
+
+    const getApplicationData = async () => {
+        const token = localStorage.getItem("token");
+        try {
+            const data = await axios.get(
+                `http://localhost:2008/apis/project/${location.state.id}/application`,
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+            setProjectData({
+                ...projectData,
+                application: data.data.application,
+            });
+        } catch (e) {
+            alert("지원서 블러오기 오류");
+        }
+    };
 
     useEffect(() => {
         getProjectData();
@@ -268,7 +287,7 @@ const projectDetail = () => {
                     onClose={handleProjectUploadClose}
                     isEdit={true}
                     projectData={projectData}
-					getProject={getProjectData}
+                    getProject={getProjectData}
                 />
             </Container>
         </>

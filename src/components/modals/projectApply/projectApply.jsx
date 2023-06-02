@@ -16,27 +16,28 @@ const ProjcetApplyModal = ({ isOpen, onClose, title, userName, projectId }) => {
     const handleDataChange = (key) => (e) => {
         setFormData({ ...formData, [key]: e.target.value });
     };
-	  
+
     const handleApply = async () => {
         const token = localStorage.getItem("token");
         if (!token || !projectId) {
-			onClose()
-			return alert("로그인이 필요합니다.");
-		}
+            onClose();
+            return alert("로그인이 필요합니다.");
+        }
         const { title, description } = formData;
         try {
-			if (!title || !description) return alert('지원서 제목과 자기소개를 입력해주세요.')
+            if (!title || !description)
+                return alert("지원서 제목과 자기소개를 입력해주세요.");
             await axios.put(
                 `http://localhost:2008/apis/project/${projectId}/application`,
                 { title, description },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
             onClose();
-			alert('지원 완료!')
+            alert("지원 완료!");
         } catch (e) {
             if (e?.response?.status === 400) return alert(e?.response?.data);
             else alert("Apply Error");
-			onClose()
+            onClose();
         }
     };
 

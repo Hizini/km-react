@@ -96,7 +96,7 @@ const SignupModal = ({ isOpen, onClose }) => {
                 contact,
             });
             onClose();
-						alert('회원가입 완료!')
+            alert("회원가입 완료!");
         } catch (e) {
             if (e?.response?.status === 400) return alert(e.response.data);
             else return alert("Sign up Error");

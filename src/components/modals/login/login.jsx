@@ -15,7 +15,7 @@ import { UserAccountState } from "../../../modules/store/common.recoil";
 
 const LoginModal = ({ isOpen, onClose, onLogin, onSignup }) => {
     const [formData, setFormData] = useState({ id: "", password: "" });
-	const [userData, setUserData] = useRecoilState(UserAccountState);
+    const [userData, setUserData] = useRecoilState(UserAccountState);
 
     const handleDataChange = (key) => (e) => {
         setFormData({ ...formData, [key]: e.target.value });
@@ -23,16 +23,22 @@ const LoginModal = ({ isOpen, onClose, onLogin, onSignup }) => {
 
     const handleLogin = async () => {
         try {
-            const response = await axios.post("http://localhost:2008/apis/user/sign-in", {
-                id: formData.id,
-                password: formData.password,
-            });
-			const token = response.data?.token
-			localStorage.setItem('token', token)
-			if(token) {
-				const user = await axios.get(`http://localhost:2008/apis/user/me`, { headers: { Authorization: `Bearer ${token}` }})
-				setUserData(user.data.data)
-			}
+            const response = await axios.post(
+                "http://localhost:2008/apis/user/sign-in",
+                {
+                    id: formData.id,
+                    password: formData.password,
+                }
+            );
+            const token = response.data?.token;
+            localStorage.setItem("token", token);
+            if (token) {
+                const user = await axios.get(
+                    `http://localhost:2008/apis/user/me`,
+                    { headers: { Authorization: `Bearer ${token}` } }
+                );
+                setUserData(user.data.data);
+            }
             onClose();
         } catch (e) {
             if (e?.response?.status === 401)

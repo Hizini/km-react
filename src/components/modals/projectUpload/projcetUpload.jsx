@@ -14,7 +14,13 @@ import axios from "axios";
 import { useRecoilState } from "recoil";
 import { UserAccountState } from "../../../modules/store/common.recoil";
 
-const ProjcetUploadModal = ({ isOpen, onClose, isEdit = false, getProject, projectData }) => {
+const ProjcetUploadModal = ({
+    isOpen,
+    onClose,
+    isEdit = false,
+    getProject,
+    projectData,
+}) => {
     const initFormData = {
         title: "",
         startDate: "",
@@ -26,90 +32,112 @@ const ProjcetUploadModal = ({ isOpen, onClose, isEdit = false, getProject, proje
         detail: "",
     };
     const [formData, setFormData] = useState(initFormData);
-	const [userData, setUserData] = useRecoilState(UserAccountState);
+    const [userData, setUserData] = useRecoilState(UserAccountState);
 
     const handleFormDataChange = (key) => (e) => {
         const value = e.target.value;
         setFormData({ ...formData, [key]: value });
     };
 
-	const handleUploadProject = async () => {
-		if(Object.values(formData).includes('')) return alert('모든 데이터를 입력해주세요.')
-		if(!formData.meetDay.includes('요일')) return alert('모임 요일을 다시 입력해주세요. ex) 화요일')
-		if(new Date(formData.startDate).getTime() > new Date(formData.endDate).getTime()) return alert('잘못된 날짜 입니다.')
-		try {
-			const token = localStorage.getItem('token')
-			if(!token) return alert ('다시 로그인 해주세요.')
+    const handleUploadProject = async () => {
+        if (Object.values(formData).includes(""))
+            return alert("모든 데이터를 입력해주세요.");
+        if (!formData.meetDay.includes("요일"))
+            return alert("모임 요일을 다시 입력해주세요. ex) 화요일");
+        if (
+            new Date(formData.startDate).getTime() >
+            new Date(formData.endDate).getTime()
+        )
+            return alert("잘못된 날짜 입니다.");
+        try {
+            const token = localStorage.getItem("token");
+            if (!token) return alert("다시 로그인 해주세요.");
 
-			const {
-				title,
-				startDate,
-				endDate,
-				meetDay,
-				meetTime,
-				memberCount,
-				description,
-				detail,
+            const {
+                title,
+                startDate,
+                endDate,
+                meetDay,
+                meetTime,
+                memberCount,
+                description,
+                detail,
             } = formData;
 
-			if(isEdit) {
-				await axios.patch(`http://localhost:2008/apis/project/${projectData._id}`, {
-					title,
-					requirements: {
-						startDate,
-						endDate,
-						meetDay,
-						meetTime,
-						detail,
-						memberCount
-					},
-					description
-				}, { headers: { Authorization: `Bearer ${token}` }});
-			}
-			else {
-				await axios.post("http://localhost:2008/apis/project", {
-					title,
-					requirements: {
-						startDate,
-						endDate,
-						meetDay,
-						meetTime,
-						detail,
-						memberCount
-					},
-					description
-				}, { headers: { Authorization: `Bearer ${token}` }});
-			}
+            if (isEdit) {
+                if (formData.memberCount < projectData.requirements.memberCount)
+                    return alert(
+                        `참여인원은 ${projectData.requirements.memberCount} 보다 작을 수 없습니다.`
+                    );
+                await axios.patch(
+                    `http://localhost:2008/apis/project/${projectData._id}`,
+                    {
+                        title,
+                        requirements: {
+                            startDate,
+                            endDate,
+                            meetDay,
+                            meetTime,
+                            detail,
+                            memberCount,
+                        },
+                        description,
+                    },
+                    { headers: { Authorization: `Bearer ${token}` } }
+                );
+            } else {
+                await axios.post(
+                    "http://localhost:2008/apis/project",
+                    {
+                        title,
+                        requirements: {
+                            startDate,
+                            endDate,
+                            meetDay,
+                            meetTime,
+                            detail,
+                            memberCount,
+                        },
+                        description,
+                    },
+                    { headers: { Authorization: `Bearer ${token}` } }
+                );
+            }
             onClose();
-			getProject();
-			const user = await axios.get(`http://localhost:2008/apis/user/me`, { headers: { Authorization: `Bearer ${token}` }})
-			setUserData(user.data.data)
+            getProject();
+            const user = await axios.get(`http://localhost:2008/apis/user/me`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            setUserData(user.data.data);
         } catch (e) {
-            if (e?.response?.status === 401) return alert('다시 로그인해주세요.');
+            if (e?.response?.status === 401)
+                return alert("다시 로그인해주세요.");
             else return alert(e?.response?.data);
         }
-	}
+    };
 
-	useEffect(() => {
-		if(isEdit) {
-			if (!projectData) return onClose();
-			const {title, requirements, description} = projectData
-			setFormData({
-				title,
-				startDate: requirements.startDate,
-				endDate: requirements.endDate,
-				meetDay: requirements.meetDay,
-				meetTime: requirements.meetTime,
-				memberCount: requirements.memberCount,
-				description: description,
-				detail: requirements.detail,
-			})
-		}
-	}, [isEdit, onClose, projectData])
+    useEffect(() => {
+        if (isEdit) {
+            if (!projectData) return onClose();
+            const { title, requirements, description } = projectData;
+            setFormData({
+                title,
+                startDate: requirements.startDate,
+                endDate: requirements.endDate,
+                meetDay: requirements.meetDay,
+                meetTime: requirements.meetTime,
+                memberCount: requirements.memberCount,
+                description: description,
+                detail: requirements.detail,
+            });
+        }
+    }, [isEdit, onClose, projectData]);
 
     return (
         <Dialog open={isOpen} maxWidth="xs" fullWidth onClose={onClose}>
-             <DialogTitle>{isEdit ? "프로젝트 수정" : "프로젝트 등록"}</DialogTitle>
+            <DialogTitle>
+                {isEdit ? "프로젝트 수정" : "프로젝트 등록"}
+            </DialogTitle>
             <FormWrap>
                 <InputRow>
                     <InputLabel>프로젝트 명</InputLabel>
@@ -118,7 +146,7 @@ const ProjcetUploadModal = ({ isOpen, onClose, isEdit = false, getProject, proje
                         variant="outlined"
                         size="small"
                         onChange={handleFormDataChange("title")}
-						value={formData.title}
+                        value={formData.title}
                     />
                 </InputRow>
                 <InputCol>
@@ -126,8 +154,8 @@ const ProjcetUploadModal = ({ isOpen, onClose, isEdit = false, getProject, proje
                     <Textarea
                         width="100%"
                         rows={4}
-						onChange={handleFormDataChange('description')}
-						value={formData.description}
+                        onChange={handleFormDataChange("description")}
+                        value={formData.description}
                     />
                 </InputCol>
                 <DetailWrap>
@@ -140,7 +168,7 @@ const ProjcetUploadModal = ({ isOpen, onClose, isEdit = false, getProject, proje
                                 size="small"
                                 type="date"
                                 onChange={handleFormDataChange("startDate")}
-								value={formData.startDate}
+                                value={formData.startDate}
                             />
                             <Input
                                 fullWidth
@@ -148,7 +176,7 @@ const ProjcetUploadModal = ({ isOpen, onClose, isEdit = false, getProject, proje
                                 size="small"
                                 type="date"
                                 onChange={handleFormDataChange("endDate")}
-								value={formData.endDate}
+                                value={formData.endDate}
                             />
                         </InputCol>
                         <InputCol>
@@ -159,7 +187,7 @@ const ProjcetUploadModal = ({ isOpen, onClose, isEdit = false, getProject, proje
                                 size="small"
                                 placeholder="ex) 화요일"
                                 onChange={handleFormDataChange("meetDay")}
-								value={formData.meetDay}
+                                value={formData.meetDay}
                             />
                         </InputCol>
                         <InputCol>
@@ -170,7 +198,7 @@ const ProjcetUploadModal = ({ isOpen, onClose, isEdit = false, getProject, proje
                                 size="small"
                                 type="time"
                                 onChange={handleFormDataChange("meetTime")}
-								value={formData.meetTime}
+                                value={formData.meetTime}
                             />
                         </InputCol>
                         <InputCol>
@@ -181,7 +209,7 @@ const ProjcetUploadModal = ({ isOpen, onClose, isEdit = false, getProject, proje
                                 size="small"
                                 type="number"
                                 onChange={handleFormDataChange("memberCount")}
-								value={formData.memberCount}
+                                value={formData.memberCount}
                             />
                         </InputCol>
                     </InfoCol>
@@ -191,13 +219,17 @@ const ProjcetUploadModal = ({ isOpen, onClose, isEdit = false, getProject, proje
                             width="100%"
                             rows={14}
                             onChange={handleFormDataChange("detail")}
-							value={formData.detail}
+                            value={formData.detail}
                         ></Textarea>
                     </InputCol>
                 </DetailWrap>
                 <BtnsWrap>
                     <Button label="닫기" onClick={onClose} width="30%" />
-                    <Button label="등록" width="30%" onClick={handleUploadProject}/>
+                    <Button
+                        label="등록"
+                        width="30%"
+                        onClick={handleUploadProject}
+                    />
                 </BtnsWrap>
             </FormWrap>
         </Dialog>

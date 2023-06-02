@@ -95,10 +95,10 @@ const projectDetail = () => {
                     { applicationId },
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
-                getApplicationData();
             } catch (e) {
-                alert("Error");
+                alert(e?.response?.data);
             }
+			getApplicationData();
         }
     };
 
